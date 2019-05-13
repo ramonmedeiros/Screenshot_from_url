@@ -3,18 +3,20 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from uuid import uuid4
 from google.cloud.storage import Client
 
+import log
 import requests
 import os
 
+logger = log.getLogger()
+log.set_verbosity(log.INFO)
 IMAGE = "my_screenshot.png"
 DRIVER = 'chromedriver'
 
 def take_screenshot(url):
-    print(is_site_reacheable(url))
     if is_site_reacheable(url) == False:
         return False
 
-    print("Doing screenshot")
+    logger.info("screenshot for %s" % url)
  
     try:
         driver = webdriver.Remote("http://127.0.0.1:4444/wd/hub", desired_capabilities=DesiredCapabilities.CHROME)
@@ -46,11 +48,13 @@ def upload_to_bucket(filename):
     bucket = client.get_bucket("detectifychallengeramon")
 
     # creating md5 basic. Can use image fingerprinting
+    logger.info("uploading screenshot")
     blob = bucket.blob(uuid4().__str__())
     blob.upload_from_filename(filename)
     
     # make public and return url
     blob.make_public()
+    logger.info("Screenshot at %s" % blob.public_url)
     return blob.public_url
 
 take_screenshot("http://www.google.com")
