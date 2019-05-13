@@ -10,7 +10,6 @@ import os
 logger = log.getLogger()
 log.set_verbosity(log.INFO)
 IMAGE = "my_screenshot.png"
-DRIVER = 'chromedriver'
 
 def take_screenshot(url):
     if is_site_reacheable(url) == False:
@@ -29,11 +28,13 @@ def take_screenshot(url):
         print "Problem with selenium" + str(e)
 
     try:
-        upload_to_bucket(IMAGE)
+        image_url = upload_to_bucket(IMAGE)
     except Exception as e:
         print "Problems while uploading image: " + str(e)
     finally:
         os.remove(IMAGE)
+
+    return image_url
 
 def is_site_reacheable(url):
 
@@ -57,4 +58,3 @@ def upload_to_bucket(filename):
     logger.info("Screenshot at %s" % blob.public_url)
     return blob.public_url
 
-take_screenshot("http://www.google.com")
