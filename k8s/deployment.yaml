@@ -34,6 +34,9 @@ spec:
       - name: dshm
         emptyDir:
           medium: Memory
+      - name: google-cloud-key
+        secret:
+          secretName: gcskey
       containers:
       - image: gcr.io/detectify-challenge-ramon/hello-app:v3
         imagePullPolicy: IfNotPresent
@@ -44,6 +47,11 @@ spec:
         volumeMounts:                 
         - mountPath: /dev/shm
           name: dshm
+        - name: google-cloud-key
+          mountPath: /var/secrets/google
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/secrets/google/key.json
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File

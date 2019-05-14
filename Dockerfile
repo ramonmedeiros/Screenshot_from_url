@@ -14,10 +14,6 @@ ENV FLASK_ENV="production"
 WORKDIR /app
 COPY * /app/
 
-# TODO: use kubernetes secrets
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/detectify-challenge-ramon-24b9a8ef7c2a.json
-COPY detectify-challenge-ramon-24b9a8ef7c2a.json /app/
-
 # install requirements
 RUN pip install -r /app/requirements.txt
 
