@@ -9,28 +9,36 @@ import os
 
 logger = log.getLogger()
 log.set_verbosity(log.INFO)
-IMAGE = "my_screenshot.png"
+IMAGE = "/tmp/my_screenshot.png"
 
 def take_screenshot(url):
     if is_site_reacheable(url) == False:
+        logger.info("%s not reacheable" % url)
         return False
 
     logger.info("screenshot for %s" % url)
  
     try:
-        driver = webdriver.Remote("http://127.0.0.1:4444/wd/hub", desired_capabilities=DesiredCapabilities.CHROME)
+
+        # enforce headless
+        options = webdriver.ChromeOptions()
+        options.add_argument('headless')
+
+        # start webdriver
+        driver = webdriver.Chrome(chrome_options=options)
+        driver.maximize_window()
         driver.get(url)
 
         # TODO: its possible to receive the base64 instead file 
         screenshot = driver.save_screenshot(IMAGE)
         driver.quit()
     except Exception as e:
-        print "Problem with selenium" + str(e)
+        logger.info("Problem with selenium" + str(e))
 
     try:
         image_url = upload_to_bucket(IMAGE)
     except Exception as e:
-        print "Problems while uploading image: " + str(e)
+        logger.info("Problems while uploading image: " + str(e))
     finally:
         os.remove(IMAGE)
 
@@ -39,11 +47,12 @@ def take_screenshot(url):
 def is_site_reacheable(url):
 
     req = requests.head(url)
-    return req.status_code == 200
+    return req.status_code < 400
 
 def upload_to_bucket(filename):
     if os.path.exists(filename) is False:
-        print "File %s does not exists" % filename
+        logger.info("File %s does not exists" % filename)
+        return false
 
     client = Client()
     bucket = client.get_bucket("detectifychallengeramon")
