@@ -1,0 +1,73 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: 2019-05-14T12:32:25Z
+  generation: 1
+  labels:
+    run: hello-web
+  name: hello-web
+  namespace: default
+  resourceVersion: "5246"
+  selfLink: /apis/extensions/v1beta1/namespaces/default/deployments/hello-web
+  uid: 54733910-7644-11e9-a056-42010aa60225
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      run: hello-web
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: hello-web
+    spec:
+      volumes:
+      - name: dshm
+        emptyDir:
+          medium: Memory
+      containers:
+      - image: gcr.io/detectify-challenge-ramon/hello-app:v3
+        imagePullPolicy: IfNotPresent
+        name: hello-web
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        volumeMounts:                 
+        - mountPath: /dev/shm
+          name: dshm
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: 2019-05-14T12:32:36Z
+    lastUpdateTime: 2019-05-14T12:32:36Z
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: 2019-05-14T12:32:25Z
+    lastUpdateTime: 2019-05-14T12:32:36Z
+    message: ReplicaSet "hello-web-86c88b4c" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

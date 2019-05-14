@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: 2019-05-14T12:56:08Z
+  labels:
+    run: hello-web
+  name: hello-web
+  namespace: default
+  resourceVersion: "9236"
+  selfLink: /api/v1/namespaces/default/services/hello-web
+  uid: a4b03e26-7647-11e9-a056-42010aa60225
+spec:
+  clusterIP: 10.27.248.127
+  externalTrafficPolicy: Cluster
+  ports:
+  - nodePort: 30365
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    run: hello-web
+  sessionAffinity: None
+  type: LoadBalancer
+status:
+  loadBalancer:
+    ingress:
+    - ip: 35.228.4.229
