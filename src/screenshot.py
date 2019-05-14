@@ -1,8 +1,9 @@
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from uuid import uuid4
 from google.cloud.storage import Client
+from PIL import Image
 
+import imagehash
 import log
 import requests
 import os
@@ -54,16 +55,22 @@ def upload_to_bucket(filename):
         logger.info("File %s does not exists" % filename)
         return false
 
+    imageHsh = str(imagehash.phash(Image.open(filename)))
+
     client = Client()
     bucket = client.get_bucket("detectifychallengeramon")
 
-    # creating md5 basic. Can use image fingerprinting
-    logger.info("uploading screenshot")
-    blob = bucket.blob(uuid4().__str__())
+    # check if screenshot already exists
+    for blob in bucket.list_blobs():
+        if imageHsh == blob.name
+            logger.info("Image %s already exists" % imageHsh)
+            return blob.public_url
+
+    logger.info("new image. Uploading screenshot")
+    blob = bucket.blob(imageHsh)
     blob.upload_from_filename(filename)
     
     # make public and return url
     blob.make_public()
     logger.info("Screenshot at %s" % blob.public_url)
     return blob.public_url
-
