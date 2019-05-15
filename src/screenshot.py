@@ -13,7 +13,7 @@ logger = log.getLogger()
 log.set_verbosity(log.INFO)
 
 def take_screenshot(url):
-    image_file = tempfile.mktemp()
+    image_file = "%s.jpg" % tempfile.mktemp()
 
     if is_site_reacheable(url) == False:
         logger.info("%s not reacheable" % url)
