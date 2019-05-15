@@ -15,6 +15,7 @@ google-resumable-media==0.3.2
 googleapis-common-protos==1.5.10
 idna==2.8
 ImageHash==4.0
+imgkit==1.0.1
 ipython==5.8.0
 ipython-genutils==0.2.0
 itsdangerous==1.1.0

@@ -1,9 +1,9 @@
-from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
 from google.cloud.storage import Client
 from PIL import Image
 
 import imagehash
+import imgkit
 import log
 import requests
 import os
@@ -20,28 +20,20 @@ def take_screenshot(url):
     logger.info("screenshot for %s" % url)
  
     try:
-
-        # enforce headless
-        options = webdriver.ChromeOptions()
-        options.add_argument('headless')
-
-        # start webdriver
-        driver = webdriver.Chrome(chrome_options=options)
-        driver.maximize_window()
-        driver.get(url)
+        imgkit.from_url(url, IMAGE)
 
         # TODO: its possible to receive the base64 instead file 
         screenshot = driver.save_screenshot(IMAGE)
-        driver.quit()
     except Exception as e:
-        logger.info("Problem with selenium" + str(e))
+        logger.info("Problem with screenshot" + str(e))
 
     try:
         image_url = upload_to_bucket(IMAGE)
     except Exception as e:
         logger.info("Problems while uploading image: " + str(e))
     finally:
-        os.remove(IMAGE)
+        if os.path.exists(IMAGE):
+            os.remove(IMAGE)
 
     return image_url
 

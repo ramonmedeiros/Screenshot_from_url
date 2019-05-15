@@ -2,7 +2,7 @@ FROM selenium/standalone-chrome
 
 # install pip
 RUN sudo apt-get update
-RUN sudo apt-get install python-pip -y
+RUN sudo apt-get install python-pip  wkhtmltopdf -y
 
 # set path to selenium files (selenium jar and chromedriver)
 ENV PATH="/opt/selenium/:/opt/google/:/opt/google/chrome:${PATH}"
