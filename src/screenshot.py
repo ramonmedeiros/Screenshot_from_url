@@ -21,9 +21,6 @@ def take_screenshot(url):
  
     try:
         imgkit.from_url(url, IMAGE)
-
-        # TODO: its possible to receive the base64 instead file 
-        screenshot = driver.save_screenshot(IMAGE)
     except Exception as e:
         logger.info("Problem with screenshot" + str(e))
 
