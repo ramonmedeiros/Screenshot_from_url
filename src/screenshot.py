@@ -62,7 +62,7 @@ def upload_to_bucket(filename):
 
     # check if screenshot already exists
     for blob in bucket.list_blobs():
-        if imageHsh == blob.name
+        if imageHsh == blob.name:
             logger.info("Image %s already exists" % imageHsh)
             return blob.public_url
 
