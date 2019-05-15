@@ -1,3 +1,5 @@
+VERSION=v10
+
 default: run
 
 container:
@@ -7,8 +9,8 @@ run: container
 	docker run --shm-size="512m" -e DBUS_SESSION_BUS_ADDRESS='/dev/null' -p 5000:5000 test-build
 
 container-google:
-	docker build -t gcr.io/detectify-challenge-ramon/hello-app:v7 src/
-	docker push gcr.io/detectify-challenge-ramon/hello-app:v7
+	docker build -t gcr.io/detectify-challenge-ramon/hello-app:$(VERSION) src/
+	docker push gcr.io/detectify-challenge-ramon/hello-app:$(VERSION)
 
 deploy:
 	kubectl delete deployments hello-web
