@@ -7,12 +7,14 @@ import imgkit
 import log
 import requests
 import os
+import tempfile
 
 logger = log.getLogger()
 log.set_verbosity(log.INFO)
-IMAGE = "/tmp/my_screenshot.png"
 
 def take_screenshot(url):
+    image_file = tempfile.mktemp()
+
     if is_site_reacheable(url) == False:
         logger.info("%s not reacheable" % url)
         return False
@@ -20,17 +22,20 @@ def take_screenshot(url):
     logger.info("screenshot for %s" % url)
  
     try:
-        imgkit.from_url(url, IMAGE)
+        imgkit.from_url(url, image_file)
     except Exception as e:
         logger.info("Problem with screenshot" + str(e))
+        return "error while screenshot " 
 
     try:
-        image_url = upload_to_bucket(IMAGE)
+        image_url = upload_to_bucket(image_file)
     except Exception as e:
         logger.info("Problems while uploading image: " + str(e))
+        return "Problems while uploading image: " + str(e)
+
     finally:
-        if os.path.exists(IMAGE):
-            os.remove(IMAGE)
+        if os.path.exists(image_file):
+            os.remove(image_file)
 
     return image_url
 
