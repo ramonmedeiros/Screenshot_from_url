@@ -11,6 +11,6 @@ container-google:
 	docker push gcr.io/detectify-challenge-ramon/hello-app:v6
 
 deploy:
-	kubectl delete deployments,services hello-web
+	kubectl delete deployments hello-web
 	kubectl create -f k8s/deployment.yaml
-	kubectl create -f k8s/service.yaml
+	kubectl scale deployment hello-web --replicas 3
