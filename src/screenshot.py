@@ -2,13 +2,12 @@ from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from google.cloud.storage import Client
-from PIL import Image
 
-import imagehash
 import log
 import requests
 import os
 import tempfile
+import hashlib
 
 logger = log.getLogger()
 log.set_verbosity(log.INFO)
@@ -20,7 +19,14 @@ def take_screenshot(url):
         logger.info("%s not reacheable" % url)
         return False
 
-    logger.info("screenshot for %s" % url)
+    imageHash = get_url_content_hash(url)
+    image_url = get_image_url(imageHash)
+
+    # image already downloaded: return link
+    if len(image_url) != 0:
+        return image_url
+
+    logger.info("taking screenshot for %s" % url)
  
     try:
         options = webdriver.ChromeOptions()
@@ -41,9 +47,8 @@ def take_screenshot(url):
         logger.info("Problem with screenshot" + str(e))
         return "error while screenshot " 
 
-
     try:
-        image_url = upload_to_bucket(image_file)
+        image_url = upload_to_bucket(image_file, imageHash)
     except Exception as e:
         logger.info("Problems while uploading image: " + str(e))
         return "Problems while uploading image: " + str(e)
@@ -59,21 +64,36 @@ def is_site_reacheable(url):
     req = requests.head(url)
     return req.status_code < 400
 
-def upload_to_bucket(filename):
+def get_url_content_hash(url):
+    try:
+        content = requests.get(url).content
+        contentHash = hashlib.md5(content).hexdigest()
+    except Exception as e:
+        logger.info("Problems while getting url: " + str(e))
+        return False
+
+    return contentHash
+
+
+def get_image_url(imageHash):
+    # check if screenshot already exists
+    client = Client()
+    bucket = client.get_bucket("detectifychallengeramon")
+    for blob in bucket.list_blobs():
+        if imageHash == blob.name:
+            logger.info("Image %s already exists" % imageHash)
+            return blob.public_url
+
+    return ''
+
+
+def upload_to_bucket(filename, imageHsh):
     if os.path.exists(filename) is False:
         logger.info("File %s does not exists" % filename)
         return false
 
-    imageHsh = str(imagehash.phash(Image.open(filename)))
-
     client = Client()
     bucket = client.get_bucket("detectifychallengeramon")
-
-    # check if screenshot already exists
-    for blob in bucket.list_blobs():
-        if imageHsh == blob.name:
-            logger.info("Image %s already exists" % imageHsh)
-            return blob.public_url
 
     logger.info("new image. Uploading screenshot")
     blob = bucket.blob(imageHsh)
