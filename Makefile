@@ -15,4 +15,4 @@ container-google:
 deploy:
 	kubectl delete deployments hello-web
 	kubectl create -f k8s/deployment.yaml
-	kubectl scale deployment hello-web --replicas 3
+	kubectl scale deployment hello-web --replicas 6
