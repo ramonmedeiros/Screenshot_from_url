@@ -1,4 +1,6 @@
-# Taking screenshots from URL
+[![Build Status](https://travis-ci.org/ramonmedeiros/Screenshot_from_url.svg?branch=master)](https://travis-ci.org/ramonmedeiros/Screenshot_from_url)
+
+# Taking screenshots from URL 
 
 Microservice that take screenshot from url (one or a list)
 
