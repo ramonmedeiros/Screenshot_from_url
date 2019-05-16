@@ -28,7 +28,6 @@ def take_screenshot(url):
 
         # start webdriver
         driver = webdriver.Chrome(chrome_options=options)
-        #driver.maximize_window()
         driver.get(url)
 
         element = driver.find_element_by_tag_name('body')
@@ -39,6 +38,7 @@ def take_screenshot(url):
     except Exception as e:
         logger.info("Problem with screenshot" + str(e))
         return "error while screenshot " 
+
 
     try:
         image_url = upload_to_bucket(image_file)
