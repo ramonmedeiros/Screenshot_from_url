@@ -35,6 +35,8 @@ def take_screenshot(url):
         with open(image_file, "wb") as file:
             file.write(element_png)
 
+        driver.quit()
+
     except Exception as e:
         logger.info("Problem with screenshot" + str(e))
         return "error while screenshot " 

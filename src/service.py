@@ -1,4 +1,5 @@
 import json
+import threading
 
 from flask import Flask, request, make_response, jsonify
 from flask_restplus import Api, Resource, fields
@@ -12,6 +13,8 @@ namespace = api.namespace("/", description="Screenshot as a Service")
 URL = "url"
 POST = "POST"
 URLS = "urls"
+
+lock = threading.Lock()
 
 @namespace.route("/screenshot")
 class Screenshot(Resource):
@@ -32,8 +35,11 @@ class Screenshot(Resource):
 
         url = rjson[URL]
 
-        # one link: return the url
-        return jsonify({"screenshot": take_screenshot(url)})
+        # don't do screenshot in paralel
+        with lock:
+            screenshotUrl = take_screenshot(url)
+
+        return jsonify({"screenshot": screenshotUrl})
 
 @namespace.route("/screenshots")
 class Screenshots(Resource):
@@ -62,7 +68,8 @@ class Screenshots(Resource):
                 return jsonify({"message": "expected urls separated by ;"}), 400
 
             for url in urls:
-                screenshots.append({url: take_screenshot(url)})
+                with lock:
+                    screenshots.append({url: take_screenshot(url)})
 
             return jsonify({"screenshots": screenshots})
 
