@@ -1,9 +1,10 @@
+from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from google.cloud.storage import Client
 from PIL import Image
 
 import imagehash
-import imgkit
 import log
 import requests
 import os
@@ -13,7 +14,7 @@ logger = log.getLogger()
 log.set_verbosity(log.INFO)
 
 def take_screenshot(url):
-    image_file = "%s.jpg" % tempfile.mktemp()
+    image_file = "%s.png" % tempfile.mktemp()
 
     if is_site_reacheable(url) == False:
         logger.info("%s not reacheable" % url)
@@ -22,7 +23,19 @@ def take_screenshot(url):
     logger.info("screenshot for %s" % url)
  
     try:
-        imgkit.from_url(url, image_file)
+        options = webdriver.ChromeOptions()
+        options.add_argument('headless')
+
+        # start webdriver
+        driver = webdriver.Chrome(chrome_options=options)
+        #driver.maximize_window()
+        driver.get(url)
+
+        element = driver.find_element_by_tag_name('body')
+        element_png = element.screenshot_as_png
+        with open(image_file, "wb") as file:
+            file.write(element_png)
+
     except Exception as e:
         logger.info("Problem with screenshot" + str(e))
         return "error while screenshot " 
@@ -68,3 +81,4 @@ def upload_to_bucket(filename):
     blob.make_public()
     logger.info("Screenshot at %s" % blob.public_url)
     return blob.public_url
+

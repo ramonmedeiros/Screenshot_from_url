@@ -1,20 +1,25 @@
 import json
 
 from flask import Flask, request, make_response, jsonify
+from flask_restplus import Api, Resource
 from screenshot import take_screenshot
+
 app = Flask("get-screenshot")
+api = Api (app = app)
+
+namespace = api.namespace("screenshot", description="Screenshot as a Service")
 
 POST = "POST"
 URL = "url"
 URLS = "urls"
 
 
-@app.before_request
+@namespace.before_request
 def only_json():
     if request.method == POST and not request.is_json:
         return "not json", 400
 
-@app.route("/screenshot", methods=[POST])
+@namespace.route("/screenshot", methods=[POST])
 def get_screenshot():
     rjson = request.json
 
