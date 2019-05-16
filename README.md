@@ -27,4 +27,7 @@ curl -X POST {"urls": "http://site.se;http://othersite.se"}
 
 ## Tech stack
 
-It uses Flask as web framework, ImageHash to generate the hash of the images and don't store duplicated files and GCP (Both Google Kubernetes Engine and Google Cloud Storage). 
+* Flask as web framework and Flask Rest+ for Swagger documentation
+* GCP (Both Google Kubernetes Engine and Google Cloud Storage). 
+* Selenium for screenshot
+
