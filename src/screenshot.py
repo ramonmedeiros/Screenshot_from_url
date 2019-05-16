@@ -16,8 +16,7 @@ def take_screenshot(url):
     image_file = "%s.png" % tempfile.mktemp()
 
     if is_site_reacheable(url) == False:
-        logger.info("%s not reacheable" % url)
-        return False
+        raise RuntimeException(f"{url} not reacheable")
 
     imageHash = get_url_content_hash(url)
     image_url = get_image_url(imageHash)
@@ -26,32 +25,18 @@ def take_screenshot(url):
     if len(image_url) != 0:
         return image_url
 
-    logger.info("taking screenshot for %s" % url)
+    logger.info(f"taking screenshot for {url}")
  
     try:
-        options = webdriver.ChromeOptions()
-        options.add_argument('headless')
-
-        # start webdriver
-        driver = webdriver.Chrome(chrome_options=options)
-        driver.get(url)
-
-        element = driver.find_element_by_tag_name('body')
-        element_png = element.screenshot_as_png
-        with open(image_file, "wb") as file:
-            file.write(element_png)
-
-        driver.quit()
+        selenium_screenshot(url, image_file)
 
     except Exception as e:
-        logger.info("Problem with screenshot" + str(e))
-        return "error while screenshot " 
+        raise RuntimeException("Problem with screenshot" + str(e))
 
     try:
         image_url = upload_to_bucket(image_file, imageHash)
     except Exception as e:
-        logger.info("Problems while uploading image: " + str(e))
-        return "Problems while uploading image: " + str(e)
+        raise RuntimeException("Problems while uploading image: " + str(e))
 
     finally:
         if os.path.exists(image_file):
@@ -60,8 +45,10 @@ def take_screenshot(url):
     return image_url
 
 def is_site_reacheable(url):
-
-    req = requests.head(url)
+    try:
+        req = requests.head(url)
+    except Exception as e:
+        raise RuntimeException(f"connection error to url {url}")
     return req.status_code < 400
 
 def get_url_content_hash(url):
@@ -69,8 +56,7 @@ def get_url_content_hash(url):
         content = requests.get(url).content
         contentHash = hashlib.md5(content).hexdigest()
     except Exception as e:
-        logger.info("Problems while getting url: " + str(e))
-        return False
+        raise RuntimeException("Problems while getting url: " + str(e))
 
     return contentHash
 
@@ -81,7 +67,7 @@ def get_image_url(imageHash):
     bucket = client.get_bucket("detectifychallengeramon")
     for blob in bucket.list_blobs():
         if imageHash == blob.name:
-            logger.info("Image %s already exists" % imageHash)
+            logger.info(f"Image {imageHash} already exists")
             return blob.public_url
 
     return ''
@@ -89,8 +75,7 @@ def get_image_url(imageHash):
 
 def upload_to_bucket(filename, imageHsh):
     if os.path.exists(filename) is False:
-        logger.info("File %s does not exists" % filename)
-        return false
+        raise RuntimeException(f"File {filename} does not exists")
 
     client = Client()
     bucket = client.get_bucket("detectifychallengeramon")
@@ -101,6 +86,38 @@ def upload_to_bucket(filename, imageHsh):
     
     # make public and return url
     blob.make_public()
-    logger.info("Screenshot at %s" % blob.public_url)
+    logger.info(f"Screenshot at {blob.public_url}")
     return blob.public_url
+
+def selenium_screenshot(url, image_file):
+    options = webdriver.ChromeOptions()
+    options.add_argument('headless')
+
+    # start webdriver
+    driver = webdriver.Chrome(chrome_options=options)
+    driver.get(url)
+
+    element = driver.find_element_by_tag_name('body')
+    element_png = element.screenshot_as_png
+    with open(image_file, "wb") as file:
+        file.write(element_png)
+
+    driver.quit()
+
+
+class RuntimeException(Exception):
+    status_code = 500
+
+    def __init__(self, message, status_code=None, payload=None):
+        Exception.__init__(self)
+        self.message = message
+        if status_code is not None:
+            self.status_code = status_code
+        self.payload = payload
+        logger.info(message)
+
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        return rv
 

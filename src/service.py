@@ -3,7 +3,7 @@ import threading
 
 from flask import Flask, request, make_response, jsonify
 from flask_restplus import Api, Resource, fields
-from screenshot import take_screenshot
+from screenshot import take_screenshot, RuntimeException
 
 app = Flask("get-screenshot")
 api = Api (app = app)
@@ -15,6 +15,10 @@ POST = "POST"
 URLS = "urls"
 
 lock = threading.Lock()
+
+@api.errorhandler(RuntimeException)
+def handle_invalid_usage(error):
+    return {'message': error.message}, 400
 
 @namespace.route("/screenshot")
 class Screenshot(Resource):

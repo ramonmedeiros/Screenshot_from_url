@@ -1,6 +1,9 @@
-VERSION=v19
+VERSION=v20
 
 default: run
+
+tests:
+	PYTHONPATH=src python -m unittest discover -v src/tests
 
 container:
 	docker build src --tag=test-build 
