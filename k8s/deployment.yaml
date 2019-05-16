@@ -38,7 +38,7 @@ spec:
         secret:
           secretName: gcskey
       containers:
-      - image: gcr.io/detectify-challenge-ramon/hello-app:v17
+      - image: gcr.io/detectify-challenge-ramon/hello-app:v19
         imagePullPolicy: IfNotPresent
         name: hello-web
         ports:
