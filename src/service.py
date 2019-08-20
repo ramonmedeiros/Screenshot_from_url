@@ -3,7 +3,7 @@ import threading
 
 from flask import Flask, request, make_response, jsonify
 from flask_restplus import Api, Resource, fields
-from screenshot import take_screenshot, RuntimeException
+from pub import take_screenshot, RuntimeException
 
 app = Flask("get-screenshot")
 api = Api (app = app)

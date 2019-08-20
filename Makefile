@@ -1,9 +1,22 @@
 VERSION=v20
-
+PROJECT=ramon-tests
+TOPIC=queue
+BUCKET=ramon_screenshots
 default: run
 
 tests:
 	PYTHONPATH=src python -m unittest discover -v src/tests
+
+set-local-vars:
+	export -a GCS_BUCKET=$(BUCKET)
+	export -a GCP_PROJECT=$(PROJECT)
+	export -a GCP_TOPIC=$(TOPIC)
+
+create-topic: set-local-vars
+	python -c "from google.cloud import pubsub_v1;pubsub_v1.PublisherClient().create_topic('projects/$(PROJECT)/topics/$(TOPIC)')"
+
+local-pub-sub:
+	gcloud beta emulators pubsub --project=$(PROJECT) start
 
 container:
 	docker build src --tag=test-build 
