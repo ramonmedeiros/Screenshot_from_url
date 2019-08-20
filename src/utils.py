@@ -5,6 +5,7 @@ import log
 logger = log.getLogger()
 log.set_verbosity(log.INFO)
 
+
 class RuntimeException(Exception):
     status_code = 500
 
@@ -21,8 +22,7 @@ class RuntimeException(Exception):
         rv['message'] = self.message
         return rv
 
+
 def get_bucket(bucket):
     client = Client()
     return client.get_bucket(bucket)
-
-

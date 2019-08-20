@@ -12,6 +12,9 @@ set-local-vars:
 	export -a GCP_PROJECT=$(PROJECT)
 	export -a GCP_TOPIC=$(TOPIC)
 
+lint-code:
+	autopep8 . --recursive --in-place --pep8-passes 2000 --verbose
+
 create-topic: set-local-vars
 	python -c "from google.cloud import pubsub_v1;pubsub_v1.PublisherClient().create_topic('projects/$(PROJECT)/topics/$(TOPIC)')"
 

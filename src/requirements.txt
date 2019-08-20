@@ -1,5 +1,6 @@
 aniso8601==6.0.0
 attrs==19.1.0
+autopep8==1.4.4
 backcall==0.1.0
 cachetools==3.1.0
 certifi==2019.3.9
@@ -37,6 +38,7 @@ protobuf==3.7.1
 ptyprocess==0.6.0
 pyasn1==0.4.5
 pyasn1-modules==0.2.5
+pycodestyle==2.5.0
 Pygments==2.4.2
 pyrsistent==0.15.2
 python-magic==0.4.15

@@ -9,6 +9,7 @@ from pub import RuntimeException
 
 EXPECTED_HASH = "7fffffffffffffff"
 
+
 class TestScreenshot(TestCase):
 
     def setUp(self):
@@ -19,9 +20,9 @@ class TestScreenshot(TestCase):
         self.server.start()
 
     def test_screenshot_successful(self):
-        content = pub.selenium_screenshot(f"http://127.0.0.1:{self.port}/src/tests/mocks/")
+        content = pub.selenium_screenshot(
+            f"http://127.0.0.1:{self.port}/src/tests/mocks/")
         assert(pub.get_image_hash(content) == EXPECTED_HASH)
 
     def teardown(self):
         self.server.exit()
-

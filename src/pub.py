@@ -34,9 +34,11 @@ def publish_messages(message, project_id=PROJECT, topic_name=TOPIC):
     future = publisher.publish(topic_path, data=json.dumps(message).encode())
     return future.result()
 
+
 def get_image_hash(content):
     with Image.open(BytesIO(base64.b64decode(content))) as fd:
         return imagehash.average_hash(fd).__str__()
+
 
 def take_screenshot(url):
 
@@ -49,6 +51,7 @@ def take_screenshot(url):
         return image_url
     publish_messages({"imageHash": imageHash, "image": content})
 
+
 def get_image_exists(imageHash):
     # check if screenshot already exists
     bucket = get_bucket(BUCKET)
@@ -59,11 +62,13 @@ def get_image_exists(imageHash):
 
     return ''
 
+
 def selenium_screenshot(url):
     logger.info(f"taking screenshot for {url}")
-    
+
     # start webdriver
-    driver = webdriver.Chrome(executable_path=chromedriver_filename, options=SELENIUM_OPTIONS)
+    driver = webdriver.Chrome(
+        executable_path=chromedriver_filename, options=SELENIUM_OPTIONS)
     try:
         driver.set_window_size("1920", "2560")
         driver.get(url)
@@ -72,4 +77,3 @@ def selenium_screenshot(url):
         driver.quit()
 
     return content
-

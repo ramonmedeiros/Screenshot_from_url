@@ -2,7 +2,7 @@ import os
 import log
 import json
 import random
-import string 
+import string
 import time
 import sys
 import base64
@@ -20,22 +20,25 @@ PROJECT = os.environ.get("GCP_PROJECT")
 TOPIC = os.environ.get("GCP_TOPIC")
 SUB_PATH = ""
 
+
 def upload_to_bucket(imageContent, imageHash):
-    
+
     try:
         bucket = get_bucket(BUCKET)
         logger.info("new image. Uploading screenshot")
-        import sys, pdb; pdb.Pdb(stdout=sys.__stdout__).set_trace()
         blob = bucket.blob(imageHash)
-        blob.upload_from_file(BytesIO(base64.b64decode(imageContent)), content_type="image/png")
-    
+        blob.upload_from_file(BytesIO(base64.b64decode(
+            imageContent)), content_type="image/png")
+
         # make public and return url
         blob.make_public()
     except Exception as e:
-        raise RuntimeException(f"Problems while uploading screenshot. {str(e)}")
+        raise RuntimeException(
+            f"Problems while uploading screenshot. {str(e)}")
 
     logger.info(f"Screenshot at {blob.public_url}")
     return blob.public_url
+
 
 def create_subscription():
     """Create a new pull subscription on the given topic."""
@@ -50,6 +53,7 @@ def create_subscription():
         SUB_PATH, topic_path)
 
     return subscription
+
 
 def receive_messages():
     """Receives messages from a pull subscription."""
@@ -66,5 +70,3 @@ def receive_messages():
     print(f'Listening for messages on {SUB_PATH}')
     while True:
         time.sleep(60)
-
-

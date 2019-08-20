@@ -6,7 +6,7 @@ from flask_restplus import Api, Resource, fields
 from pub import take_screenshot, RuntimeException
 
 app = Flask("get-screenshot")
-api = Api (app = app)
+api = Api(app=app)
 
 namespace = api.namespace("/", description="Screenshot as a Service")
 
@@ -16,9 +16,11 @@ URLS = "urls"
 
 lock = threading.Lock()
 
+
 @api.errorhandler(RuntimeException)
 def handle_invalid_usage(error):
     return {'message': error.message}, 400
+
 
 @namespace.route("/screenshot")
 class Screenshot(Resource):
@@ -44,6 +46,7 @@ class Screenshot(Resource):
             screenshotUrl = take_screenshot(url)
 
         return jsonify({"screenshot": screenshotUrl})
+
 
 @namespace.route("/screenshots")
 class Screenshots(Resource):
@@ -78,4 +81,3 @@ class Screenshots(Resource):
             return jsonify({"screenshots": screenshots})
 
         return jsonify({"message": "invalid request"}), 400
-
