@@ -9,12 +9,15 @@ Click==7.0
 decorator==4.4.0
 Flask==1.0.2
 flask-restplus==0.12.1
-google-api-core==1.11.0
+google-api-core==1.14.2
 google-auth==1.6.3
 google-cloud-core==0.29.1
+google-cloud-pubsub==0.45.0
 google-cloud-storage==1.15.1
 google-resumable-media==0.3.2
-googleapis-common-protos==1.5.10
+googleapis-common-protos==1.6.0
+grpc-google-iam-v1==0.12.3
+grpcio==1.23.0
 idna==2.8
 ImageHash==4.0
 ipython==7.7.0
