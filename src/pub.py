@@ -48,8 +48,10 @@ def take_screenshot(url):
 
     # image already downloaded: return link
     if len(image_url) != 0:
-        return image_url
+        return {"url": image_url}
+
     publish_messages({"imageHash": imageHash, "image": content})
+    return {"hash": imageHash}
 
 
 def get_image_exists(imageHash):

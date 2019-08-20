@@ -1,9 +1,10 @@
 import json
 import threading
+import time
 
 from flask import Flask, request, make_response, jsonify
 from flask_restplus import Api, Resource, fields
-from pub import take_screenshot, RuntimeException
+from pub import take_screenshot, RuntimeException, get_image_exists
 
 app = Flask("get-screenshot")
 api = Api(app=app)
@@ -13,8 +14,6 @@ namespace = api.namespace("/", description="Screenshot as a Service")
 URL = "url"
 POST = "POST"
 URLS = "urls"
-
-lock = threading.Lock()
 
 
 @api.errorhandler(RuntimeException)
@@ -39,13 +38,22 @@ class Screenshot(Resource):
         if URL not in rjson.keys():
             return jsonify({"message": "invalid request"}), 400
 
+        # take screenshot
         url = rjson[URL]
+        ret = take_screenshot(url)
 
-        # don't do screenshot in paralel
-        with lock:
-            screenshotUrl = take_screenshot(url)
+        # ret is a link: return
+        if "url" in ret.keys():
+            return jsonify({"screenshot": ret["url"]})
 
-        return jsonify({"screenshot": screenshotUrl})
+        # wait for screenshot
+        for i in range(10):
+            link = get_image_exists(ret["hash"])
+            if len(link) > 0:
+                break
+            time.sleep(0.01)
+ 
+        return jsonify({"screenshot": link})
 
 
 @namespace.route("/screenshots")
@@ -75,8 +83,7 @@ class Screenshots(Resource):
                 return jsonify({"message": "expected urls separated by ;"}), 400
 
             for url in urls:
-                with lock:
-                    screenshots.append({url: take_screenshot(url)})
+                screenshots.append({url: take_screenshot(url)})
 
             return jsonify({"screenshots": screenshots})
 
